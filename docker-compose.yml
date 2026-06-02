@@ -1,5 +1,3 @@
-version: "3.8"
-
 services:
   orbslam3:
     build:
@@ -16,6 +14,7 @@ services:
       - /tmp/.X11-unix:/tmp/.X11-unix:rw
       - ${HOME}/datasets:/root/datasets
       - ${HOME}/orbslam3_results:/root/results
+      - ${HOME}/orbslam3_custom/scripts:/root/scripts
 
     stdin_open: true
     tty: true

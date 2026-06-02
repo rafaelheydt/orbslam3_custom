@@ -4,7 +4,7 @@ datasets/
 *.zip
 *.tgz
 *.bag
-
+.vscode
 # Arquivos temporários
 __pycache__/
 *.pyc

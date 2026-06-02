@@ -12,13 +12,14 @@ RUN apt-get update && apt-get install -y \
     libssl-dev libopencv-dev \
     python3-pip \
     libgl1-mesa-glx libgl1-mesa-dri \
+    libepoxy-dev \
     nano vim htop \
     && rm -rf /var/lib/apt/lists/*
 
 # =============================================================================
-# Pangolin
+# Pangolin v0.6 — compatível com ORB-SLAM3
 # =============================================================================
-RUN git clone --depth 1 \
+RUN git clone --depth 1 --branch v0.6 \
     https://github.com/stevenlovegrove/Pangolin.git /opt/Pangolin && \
     cd /opt/Pangolin && mkdir build && cd build && \
     cmake .. -DCMAKE_BUILD_TYPE=Release && \
@@ -42,10 +43,16 @@ RUN cd /opt/ORB_SLAM3 && \
 # Descompimir vocabulário
 RUN cd /opt/ORB_SLAM3/Vocabulary && tar -xf ORBvoc.txt.tar.gz
 
-# Compilar ORB-SLAM3
-RUN cd /opt/ORB_SLAM3 && chmod +x build.sh && ./build.sh
+# Compilar ORB-SLAM3 — patch OpenCV 4.2 + forçar C++14
+RUN sed -i 's/find_package(OpenCV 4.4/find_package(OpenCV 4/' \
+      /opt/ORB_SLAM3/CMakeLists.txt && \
+    sed -i 's/OpenCV > 4.4/OpenCV > 4/' \
+      /opt/ORB_SLAM3/CMakeLists.txt && \
+    sed -i 's/-std=c++11/-std=c++14/g' \
+      /opt/ORB_SLAM3/CMakeLists.txt && \
+    cd /opt/ORB_SLAM3 && chmod +x build.sh && ./build.sh
 
-# Descomentar e compilar executáveis TUM
+# Descomentar executáveis TUM + desabilitar viewer + compilar
 RUN cd /opt/ORB_SLAM3 && \
     sed -i '0,/^# add_executable(rgbd_tum/{s/^# add_executable(rgbd_tum/add_executable(rgbd_tum/}' CMakeLists.txt && \
     sed -i '0,/^#         Examples\/RGB-D\/rgbd_tum/{s/^#         Examples\/RGB-D\/rgbd_tum/        Examples\/RGB-D\/rgbd_tum/}' CMakeLists.txt && \
@@ -53,13 +60,13 @@ RUN cd /opt/ORB_SLAM3 && \
     sed -i '0,/^# add_executable(mono_tum/{s/^# add_executable(mono_tum/add_executable(mono_tum/}' CMakeLists.txt && \
     sed -i '0,/^#         Examples\/Monocular\/mono_tum/{s/^#         Examples\/Monocular\/mono_tum/        Examples\/Monocular\/mono_tum/}' CMakeLists.txt && \
     sed -i '0,/^# target_link_libraries(mono_tum/{s/^# target_link_libraries(mono_tum/target_link_libraries(mono_tum/}' CMakeLists.txt && \
+    sed -i 's/System::RGBD,true/System::RGBD,false/' Examples/RGB-D/rgbd_tum.cc && \
+    sed -i 's/System::Monocular,true/System::Monocular,false/' Examples/Monocular/mono_tum.cc && \
     cd build && cmake .. && \
-    make rgbd_tum mono_tum -j$(nproc) && \
-    cp rgbd_tum /opt/ORB_SLAM3/Examples/RGB-D/ && \
-    cp mono_tum /opt/ORB_SLAM3/Examples/Monocular/
+    make rgbd_tum mono_tum -j$(nproc)
 
 # =============================================================================
-# EVO para avaliação
+# EVO para avaliação de trajetórias
 # =============================================================================
 RUN pip3 install evo
 
