@@ -61,8 +61,7 @@ RUN cd /opt/ORB_SLAM3 && \
     sed -i '0,/^#         Examples\/Monocular\/mono_tum/{s/^#         Examples\/Monocular\/mono_tum/        Examples\/Monocular\/mono_tum/}' CMakeLists.txt && \
     sed -i '0,/^# target_link_libraries(mono_tum/{s/^# target_link_libraries(mono_tum/target_link_libraries(mono_tum/}' CMakeLists.txt && \
     sed -i 's/System::RGBD,true/System::RGBD,false/' Examples/RGB-D/rgbd_tum.cc && \
-    sed -i 's/System::Monocular,true/System::Monocular,false/' Examples/Monocular/mono_tum.cc && \
-    cd build && cmake .. && \
+    sed -i 's/System::MONOCULAR,true/System::MONOCULAR,false/' Examples/Monocular/mono_tum.cc && \    cd build && cmake .. && \
     make rgbd_tum mono_tum -j$(nproc)
 
 # =============================================================================

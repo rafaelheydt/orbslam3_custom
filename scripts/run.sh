@@ -109,7 +109,7 @@ for RUN in $(seq 1 $N_RUNS); do
 
     rm -f /root/KeyFrameTrajectory.txt /root/CameraTrajectory.txt
     START=$(date +%s)
-
+    cd /root 
     # Executar SLAM
     if [ "$MODE" = "monocular" ]; then
         DISPLAY= "$EXE" "$VOCAB" "$YAML" "$DATASET_PATH"
