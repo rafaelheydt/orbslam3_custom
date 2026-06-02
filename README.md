@@ -29,7 +29,7 @@ orbslam3_custom/
 ## Instalação
 
 ```bash
-https://github.com/rafaelheydt/orbslam3-custom.git
+git clone https://github.com/rafaelheydt/orbslam3-custom.git
 cd orbslam3-custom
 xhost +local:docker
 docker compose build
