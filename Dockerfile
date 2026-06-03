@@ -1,84 +1,106 @@
-FROM ubuntu:20.04
+FROM ubuntu:22.04
 
 ENV DEBIAN_FRONTEND=noninteractive
+ENV TZ=America/Sao_Paulo
 
 # =============================================================================
-# Dependências do sistema
+# Build arguments
+# USE_VIEWER=0 desabilita o viewer (padrao para servidores sem GPU/display)
+# USE_VIEWER=1 habilita o viewer Pangolin
+# =============================================================================
+ARG USE_VIEWER=0
+
+# =============================================================================
+# Dependencias do sistema
 # =============================================================================
 RUN apt-get update && apt-get install -y \
-    build-essential cmake git wget unzip \
-    libglew-dev libpython2.7-dev \
-    libboost-all-dev libeigen3-dev \
-    libssl-dev libopencv-dev \
-    python3-pip \
-    libgl1-mesa-glx libgl1-mesa-dri \
-    libepoxy-dev \
-    nano vim htop \
+    git cmake build-essential \
+    libopencv-dev python3-opencv \
+    libeigen3-dev \
+    libpangolin-dev \
+    libssl-dev \
+    python3-pip python3-dev \
+    curl wget unzip nano vim htop \
+    locales \
+    && locale-gen en_US en_US.UTF-8 \
+    && update-locale LC_ALL=en_US.UTF-8 LANG=en_US.UTF-8 \
     && rm -rf /var/lib/apt/lists/*
 
-# =============================================================================
-# Pangolin v0.6 — compatível com ORB-SLAM3
-# =============================================================================
-RUN git clone --depth 1 --branch v0.6 \
-    https://github.com/stevenlovegrove/Pangolin.git /opt/Pangolin && \
-    cd /opt/Pangolin && mkdir build && cd build && \
-    cmake .. -DCMAKE_BUILD_TYPE=Release && \
-    make -j$(nproc) && make install && ldconfig
+ENV LANG=en_US.UTF-8
 
 # =============================================================================
-# ORB-SLAM3 original (UZ-SLAMLab)
+# ROS 2 Humble
 # =============================================================================
-RUN git clone https://github.com/UZ-SLAMLab/ORB_SLAM3.git /opt/ORB_SLAM3
+RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
+    -o /usr/share/keyrings/ros-archive-keyring.gpg && \
+    echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/ros-archive-keyring.gpg] \
+    http://packages.ros.org/ros2/ubuntu jammy main" > /etc/apt/sources.list.d/ros2.list && \
+    apt-get update && apt-get install -y \
+    ros-humble-ros-base \
+    ros-humble-cv-bridge \
+    ros-humble-image-transport \
+    ros-humble-sensor-msgs \
+    ros-humble-nav-msgs \
+    ros-humble-geometry-msgs \
+    ros-humble-visualization-msgs \
+    ros-humble-rosbag2 \
+    ros-humble-rosbag2-storage-default-plugins \
+    ros-humble-image-tools \
+    ros-humble-camera-info-manager \
+    python3-colcon-common-extensions \
+    python3-rosdep \
+    && rm -rf /var/lib/apt/lists/*
 
-# Patch OpenCV 4.x
-RUN cd /opt/ORB_SLAM3 && \
-    find src/ include/ -name "*.cc" -o -name "*.cpp" -o -name "*.h" | \
-    xargs grep -l "CV_LOAD_IMAGE_UNCHANGED" 2>/dev/null | \
-    xargs -I{} sed -i 's/CV_LOAD_IMAGE_UNCHANGED/cv::IMREAD_UNCHANGED/g' {} ; \
-    find src/ include/ -name "*.cc" -o -name "*.cpp" | \
-    xargs grep -l "CV_BGR2GRAY" 2>/dev/null | \
-    xargs -I{} sed -i 's/CV_BGR2GRAY/cv::COLOR_BGR2GRAY/g' {} ; \
-    sed -i '1s/^/#include <unistd.h>\n/' src/System.cc
+RUN rosdep init && rosdep update
 
-# Descompimir vocabulário
-RUN cd /opt/ORB_SLAM3/Vocabulary && tar -xf ORBvoc.txt.tar.gz
-
-# Compilar ORB-SLAM3 — patch OpenCV 4.2 + forçar C++14
-RUN sed -i 's/find_package(OpenCV 4.4/find_package(OpenCV 4/' \
-      /opt/ORB_SLAM3/CMakeLists.txt && \
-    sed -i 's/OpenCV > 4.4/OpenCV > 4/' \
-      /opt/ORB_SLAM3/CMakeLists.txt && \
-    sed -i 's/-std=c++11/-std=c++14/g' \
-      /opt/ORB_SLAM3/CMakeLists.txt && \
+# =============================================================================
+# ORB-SLAM3 — fork corrigido para Ubuntu 22.04 / ROS 2 Humble
+# Referencia: https://github.com/zang09/ORB-SLAM3-STEREO-FIXED
+# =============================================================================
+RUN git clone https://github.com/zang09/ORB-SLAM3-STEREO-FIXED.git /opt/ORB_SLAM3 && \
     cd /opt/ORB_SLAM3 && chmod +x build.sh && ./build.sh
 
-# Descomentar executáveis TUM + desabilitar viewer + compilar
-# Descomentar executáveis TUM + desabilitar viewer + compilar
-RUN cd /opt/ORB_SLAM3 && \
-    sed -i '0,/^# add_executable(rgbd_tum/{s/^# add_executable(rgbd_tum/add_executable(rgbd_tum/}' CMakeLists.txt && \
-    sed -i '0,/^#         Examples\/RGB-D\/rgbd_tum/{s/^#         Examples\/RGB-D\/rgbd_tum/        Examples\/RGB-D\/rgbd_tum/}' CMakeLists.txt && \
-    sed -i '0,/^# target_link_libraries(rgbd_tum/{s/^# target_link_libraries(rgbd_tum/target_link_libraries(rgbd_tum/}' CMakeLists.txt && \
-    sed -i '0,/^# add_executable(mono_tum/{s/^# add_executable(mono_tum/add_executable(mono_tum/}' CMakeLists.txt && \
-    sed -i '0,/^#         Examples\/Monocular\/mono_tum/{s/^#         Examples\/Monocular\/mono_tum/        Examples\/Monocular\/mono_tum/}' CMakeLists.txt && \
-    sed -i '0,/^# target_link_libraries(mono_tum/{s/^# target_link_libraries(mono_tum/target_link_libraries(mono_tum/}' CMakeLists.txt && \
-    sed -i 's/System::RGBD,true/System::RGBD,false/' Examples/RGB-D/rgbd_tum.cc && \
-    sed -i 's/System::MONOCULAR,true/System::MONOCULAR,false/' Examples/Monocular/mono_tum.cc && \
-    cd build && cmake .. && \
-    make rgbd_tum mono_tum -j$(nproc)
+# Patch viewer condicional
+RUN if [ "$USE_VIEWER" = "0" ]; then \
+        echo "Viewer DESABILITADO" && \
+        sed -i 's/System::RGBD,true/System::RGBD,false/' \
+            /opt/ORB_SLAM3/Examples/RGB-D/rgbd_tum.cc 2>/dev/null || true && \
+        sed -i 's/System::MONOCULAR,true/System::MONOCULAR,false/' \
+            /opt/ORB_SLAM3/Examples/Monocular/mono_tum.cc 2>/dev/null || true && \
+        cd /opt/ORB_SLAM3/build && make rgbd_tum mono_tum -j$(nproc) 2>/dev/null || true ; \
+    else \
+        echo "Viewer HABILITADO" ; \
+    fi
+
+# Patch TUM3.yaml
+RUN grep -q "DepthMapFactor" /opt/ORB_SLAM3/Examples/RGB-D/TUM3.yaml || \
+    echo "RGBD.DepthMapFactor: 5000.0" >> /opt/ORB_SLAM3/Examples/RGB-D/TUM3.yaml
 
 # =============================================================================
-# EVO para avaliação de trajetórias
+# ROS 2 Wrapper para ORB-SLAM3
+# Referencia: https://gitlab.com/akbedaka/orb_slam3_ros2
 # =============================================================================
-RUN pip3 install evo
+RUN mkdir -p /opt/orb_slam3_ros2_ws/src && \
+    cd /opt/orb_slam3_ros2_ws/src && \
+    git clone https://gitlab.com/akbedaka/orb_slam3_ros2.git orbslam3_ros2
+
+RUN cd /opt/orb_slam3_ros2_ws && \
+    /bin/bash -c "source /opt/ros/humble/setup.bash && colcon build --symlink-install"
+
+# =============================================================================
+# EVO + rosbags
+# =============================================================================
+RUN pip3 install evo rosbags
 
 # =============================================================================
 # Ambiente
 # =============================================================================
 ENV ORBSLAM3_DIR=/opt/ORB_SLAM3
 ENV VOCAB=/opt/ORB_SLAM3/Vocabulary/ORBvoc.txt
+ENV USE_VIEWER=${USE_VIEWER}
 
-RUN echo 'alias rgbd_tum="/opt/ORB_SLAM3/Examples/RGB-D/rgbd_tum"' >> ~/.bashrc && \
-    echo 'alias mono_tum="/opt/ORB_SLAM3/Examples/Monocular/mono_tum"' >> ~/.bashrc && \
+RUN echo 'source /opt/ros/humble/setup.bash' >> ~/.bashrc && \
+    echo 'source /opt/orb_slam3_ros2_ws/install/setup.bash' >> ~/.bashrc && \
     echo 'export VOCAB=/opt/ORB_SLAM3/Vocabulary/ORBvoc.txt' >> ~/.bashrc && \
     echo 'export ORBSLAM3_DIR=/opt/ORB_SLAM3' >> ~/.bashrc
 

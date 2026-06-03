@@ -3,6 +3,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      args:
+        USE_VIEWER: 1        # ← dentro do build
     image: orbslam3-custom:latest
     container_name: orbslam3_custom
 
