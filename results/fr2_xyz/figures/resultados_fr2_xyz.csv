@@ -1,0 +1,5 @@
+Metodo,Alinhamento,Poses,Cobertura,RMSE (m),Mean (m),Max (m),Std (m)
+DAV2 Large,Sim(3),3669,100.0%,0.0825,0.0668,0.2420,0.0484
+MiDaS,Sim(3),3669,100.0%,0.0899,0.0686,0.2673,0.0581
+Monocular,Sim(3),59,1.6%,0.0031,0.0028,0.0060,0.0013
+RGB-D Real,SE(3),3615,98.5%,0.0040,0.0036,0.0102,0.0018

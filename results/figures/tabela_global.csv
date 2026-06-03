@@ -1,0 +1,13 @@
+Dataset,Metodo,Alinhamento,Poses,Cobertura,RMSE (m),Mean (m),Max (m)
+fr1_desk,DAV2 Large,SE(3),612,106.8%,0.3514,0.3387,0.6025
+fr1_desk,MiDaS,SE(3),611,106.6%,0.9913,0.9384,1.5237
+fr1_desk,Monocular,Sim(3),124,21.6%,0.0453,0.0332,0.1862
+fr1_desk,RGB-D Real,SE(3),572,99.8%,0.0223,0.0198,0.0643
+fr2_xyz,DAV2 Large,SE(3),3669,100.0%,0.2118,0.1723,0.6062
+fr2_xyz,MiDaS,SE(3),3669,100.0%,0.1863,0.1471,0.5659
+fr2_xyz,Monocular,Sim(3),59,1.6%,0.0031,0.0028,0.0060
+fr2_xyz,RGB-D Real,SE(3),3615,98.5%,0.0040,0.0036,0.0102
+fr3_office,DAV2 Large,SE(3),2583,99.9%,1.0255,0.9942,1.5360
+fr3_office,MiDaS,SE(3),2582,99.9%,1.1872,1.0996,1.8888
+fr3_office,Monocular,Sim(3),314,12.1%,0.0124,0.0106,0.0357
+fr3_office,RGB-D Real,SE(3),2486,96.2%,0.0126,0.0110,0.0348

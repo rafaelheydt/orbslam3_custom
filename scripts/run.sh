@@ -38,6 +38,13 @@ case $DATASET in
         YAML_MONO="$ORBSLAM3_DIR/Examples/Monocular/TUM2.yaml"
         ASSOC_REAL="$ORBSLAM3_DIR/Examples/RGB-D/associations/fr2_xyz.txt"
         ;;
+    fr3_office)
+        DATASET_PATH="$DATASETS_DIR/rgbd_dataset_freiburg3_long_office_household"
+        GROUNDTRUTH="$DATASET_PATH/groundtruth.txt"
+        YAML_RGBD="$ORBSLAM3_DIR/Examples/RGB-D/TUM3.yaml"
+        YAML_MONO="$ORBSLAM3_DIR/Examples/Monocular/TUM3.yaml"
+        ASSOC_REAL="$ORBSLAM3_DIR/Examples/RGB-D/associations/fr3_office.txt"
+        ;;
     *)
         echo -e "${RED}ERRO: dataset desconhecido: $DATASET${NC}"
         echo "Opções: fr1_desk | fr2_xyz"

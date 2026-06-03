@@ -1,5 +1,4 @@
 # Resultados e datasets não vão para o git
-results/
 datasets/
 *.zip
 *.tgz
