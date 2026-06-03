@@ -3,11 +3,6 @@ FROM ubuntu:22.04
 ENV DEBIAN_FRONTEND=noninteractive
 ENV TZ=America/Sao_Paulo
 
-# =============================================================================
-# Build arguments
-# USE_VIEWER=0 desabilita o viewer (padrao para servidores sem GPU/display)
-# USE_VIEWER=1 habilita o viewer Pangolin
-# =============================================================================
 ARG USE_VIEWER=0
 
 # =============================================================================
@@ -17,8 +12,18 @@ RUN apt-get update && apt-get install -y \
     git cmake build-essential \
     libopencv-dev python3-opencv \
     libeigen3-dev \
-    libpangolin-dev \
     libssl-dev \
+    libglew-dev \
+    libepoxy-dev \
+    libgl1-mesa-dev \
+    libegl1-mesa-dev \
+    libgles2-mesa-dev \
+    libgtk2.0-dev \
+    libboost-all-dev \
+    libboost-serialization-dev \
+    pkg-config \
+    libjpeg-dev libpng-dev libtiff-dev \
+    libavcodec-dev libavformat-dev libswscale-dev \
     python3-pip python3-dev \
     curl wget unzip nano vim htop \
     locales \
@@ -52,6 +57,17 @@ RUN curl -sSL https://raw.githubusercontent.com/ros/rosdistro/master/ros.key \
     && rm -rf /var/lib/apt/lists/*
 
 RUN rosdep init && rosdep update
+
+# =============================================================================
+# Pangolin — compilar do source (necessario para Ubuntu 22.04)
+# =============================================================================
+RUN git clone --depth 1 https://github.com/stevenlovegrove/Pangolin.git /opt/Pangolin && \
+    cd /opt/Pangolin && \
+    cmake -B build -DCMAKE_BUILD_TYPE=Release \
+          -DBUILD_PANGOLIN_PYTHON=OFF \
+          -DBUILD_EXAMPLES=OFF && \
+    cmake --build build -j$(nproc) && \
+    cmake --install build && ldconfig
 
 # =============================================================================
 # ORB-SLAM3 — fork corrigido para Ubuntu 22.04 / ROS 2 Humble
