@@ -3,7 +3,8 @@ datasets/
 *.zip
 *.tgz
 *.bag
-.vscode
+.vscode/
+.ipynb_checkpoints/
 # Arquivos temporários
 __pycache__/
 *.pyc

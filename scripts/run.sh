@@ -47,7 +47,7 @@ case $DATASET in
         ;;
     *)
         echo -e "${RED}ERRO: dataset desconhecido: $DATASET${NC}"
-        echo "Opções: fr1_desk | fr2_xyz"
+        echo "Opções: fr1_desk | fr2_xyz | fr3_office"
         exit 1
         ;;
 esac
@@ -71,15 +71,40 @@ case $MODE in
         YAML="$YAML_RGBD"
         MODE_DISPLAY="RGB-D + MiDaS"
         ;;
+    midas_affine)
+        EXE="$ORBSLAM3_DIR/Examples/RGB-D/rgbd_tum"
+        ASSOC="$DATASET_PATH/associations_midas_affine.txt"
+        YAML="$YAML_RGBD"
+        MODE_DISPLAY="RGB-D + MiDaS + Affine"
+        ;;
     dav2_vitl|dav2_vitb|dav2_vits)
         EXE="$ORBSLAM3_DIR/Examples/RGB-D/rgbd_tum"
         ASSOC="$DATASET_PATH/associations_${MODE}.txt"
-        YAML="$YAML_RGBD"
         MODE_DISPLAY="RGB-D + DAV2 ${MODE#dav2_}"
+        # Usar yaml calibrado se existir para fr2_xyz
+        YAML_DAV2_CALIBRADO="/root/scripts/TUM2_dav2.yaml"
+        if [ -f "$YAML_DAV2_CALIBRADO" ] && [ "$DATASET" = "fr2_xyz" ]; then
+            YAML="$YAML_DAV2_CALIBRADO"
+            echo "Usando yaml calibrado: $YAML_DAV2_CALIBRADO"
+        else
+            YAML="$YAML_RGBD"
+        fi
+        ;;
+    dav2_metric_vitl)
+        EXE="$ORBSLAM3_DIR/Examples/RGB-D/rgbd_tum"
+        ASSOC="$DATASET_PATH/associations_dav2_metric_vitl.txt"
+        YAML="$YAML_RGBD"
+        MODE_DISPLAY="RGB-D + DAV2 Métrico"
+        ;;
+    dav2_metric_vitl_affine)
+        EXE="$ORBSLAM3_DIR/Examples/RGB-D/rgbd_tum"
+        ASSOC="$DATASET_PATH/associations_dav2_metric_vitl_affine.txt"
+        YAML="$YAML_RGBD"
+        MODE_DISPLAY="RGB-D + DAV2 Métrico + Affine"
         ;;
     *)
         echo -e "${RED}ERRO: modo desconhecido: $MODE${NC}"
-        echo "Opções: rgbd_baseline | monocular | midas | dav2_vitl | dav2_vitb | dav2_vits"
+        echo "Opções: rgbd_baseline | monocular | midas | midas_affine | dav2_vitl | dav2_metric_vitl | dav2_metric_vitl_affine"
         exit 1
         ;;
 esac
@@ -116,12 +141,13 @@ for RUN in $(seq 1 $N_RUNS); do
 
     rm -f /root/KeyFrameTrajectory.txt /root/CameraTrajectory.txt
     START=$(date +%s)
-    cd /root 
+    cd /root
+
     # Executar SLAM
     if [ "$MODE" = "monocular" ]; then
-        DISPLAY= "$EXE" "$VOCAB" "$YAML" "$DATASET_PATH"
+        "$EXE" "$VOCAB" "$YAML" "$DATASET_PATH"
     else
-        DISPLAY= "$EXE" "$VOCAB" "$YAML" "$DATASET_PATH" "$ASSOC"
+        "$EXE" "$VOCAB" "$YAML" "$DATASET_PATH" "$ASSOC"
     fi
 
     END=$(date +%s)

@@ -1,13 +1,16 @@
-Dataset,Metodo,Alinhamento,Poses,Cobertura,RMSE (m),Mean (m),Max (m)
-fr1_desk,DAV2 Large,SE(3),612,106.8%,0.3514,0.3387,0.6025
-fr1_desk,MiDaS,SE(3),611,106.6%,0.9913,0.9384,1.5237
-fr1_desk,Monocular,Sim(3),124,21.6%,0.0453,0.0332,0.1862
-fr1_desk,RGB-D Real,SE(3),572,99.8%,0.0223,0.0198,0.0643
-fr2_xyz,DAV2 Large,SE(3),3669,100.0%,0.2118,0.1723,0.6062
-fr2_xyz,MiDaS,SE(3),3669,100.0%,0.1863,0.1471,0.5659
-fr2_xyz,Monocular,Sim(3),59,1.6%,0.0031,0.0028,0.0060
-fr2_xyz,RGB-D Real,SE(3),3615,98.5%,0.0040,0.0036,0.0102
-fr3_office,DAV2 Large,SE(3),2583,99.9%,1.0255,0.9942,1.5360
-fr3_office,MiDaS,SE(3),2582,99.9%,1.1872,1.0996,1.8888
-fr3_office,Monocular,Sim(3),314,12.1%,0.0124,0.0106,0.0357
-fr3_office,RGB-D Real,SE(3),2486,96.2%,0.0126,0.0110,0.0348
+Dataset,Pipeline,RMSE (cm),Mean (cm),Max (cm),Poses,Cob (%),Trajetória
+fr2_xyz,RGB-D Baseline,0.4,0.36,1.02,3615,98.5,CameraTrajectory
+fr2_xyz,Monocular,7.91,7.18,14.6,62,1.7,KeyFrameTrajectory
+fr2_xyz,MiDaS,27.79,23.32,74.27,3669,100.0,CameraTrajectory
+fr2_xyz,MiDaS + Affine,8.15,6.19,27.48,3669,100.0,CameraTrajectory
+fr2_xyz,DAV2 Métrico,8.75,7.64,17.36,3669,100.0,CameraTrajectory
+fr1_desk,RGB-D Baseline,1.69,1.42,6.19,572,99.8,CameraTrajectory
+fr1_desk,Monocular,6.05,5.77,10.04,118,20.6,KeyFrameTrajectory
+fr1_desk,MiDaS,28.52,26.15,56.42,612,106.8,CameraTrajectory
+fr1_desk,MiDaS + Affine,21.0,18.99,41.94,612,106.8,CameraTrajectory
+fr1_desk,DAV2 Métrico,24.58,22.82,40.0,612,106.8,CameraTrajectory
+fr3_office,RGB-D Baseline,1.21,1.04,4.34,2486,96.2,CameraTrajectory
+fr3_office,Monocular,121.66,117.87,165.92,307,11.9,KeyFrameTrajectory
+fr3_office,MiDaS,440.88,411.11,697.11,2580,99.8,CameraTrajectory
+fr3_office,MiDaS + Affine,42.85,37.28,101.24,2583,99.9,CameraTrajectory
+fr3_office,DAV2 Métrico,31.22,28.44,58.18,2583,99.9,CameraTrajectory
