@@ -14,7 +14,6 @@ orbslam3_custom/
 ├── scripts/
 │   ├── config.sh              ← edite aqui para configurar o experimento
 │   ├── run.sh                 ← pipeline automático (não editar)
-│   ├── TUM2_dav2.yaml         ← yaml calibrado para DAV2 relativo (fr2_xyz)
 │   └── calibrar_depth_metrico.py ← calibração affine do depth sintético
 └── results/
     ├── fr1_desk/
@@ -102,7 +101,7 @@ nano scripts/config.sh
 
 ```bash
 DATASET="fr2_xyz"        # fr1_desk | fr2_xyz | fr3_office
-MODE="rgbd_baseline"     # ver tabela de modos abaixo
+MODE="dav2_metric_vitl"  # ver tabela de modos abaixo
 N_RUNS=1                 # número de runs
 RUN_EVO=true             # avaliar com EVO automaticamente
 ```
@@ -124,7 +123,7 @@ bash /root/scripts/run.sh
 
 ```bash
 # No host
-ls ~/orbslam3_results/fr2_xyz/rgbd_baseline/
+ls ~/orbslam3_results/fr2_xyz/dav2_metric_vitl/
 ```
 
 ---
@@ -143,11 +142,9 @@ ls ~/orbslam3_results/fr2_xyz/rgbd_baseline/
 
 | `MODE` | Sensor de profundidade | Calibração |
 |---|---|---|
-| `rgbd_baseline` | Depth real do sensor RGB-D | — |
-| `monocular` | Câmera monocular (sem depth) | — |
+| `rgbd_baseline` | Depth real do sensor RGB-D (referência) | — |
 | `midas` | MiDaS DPT_Large (relativo) | nenhuma |
 | `midas_affine` | MiDaS DPT_Large + calibração affine | `s·d+t` global por dataset |
-| `dav2_vitl` | DAV2 Large relativo | nenhuma |
 | `dav2_metric_vitl` | DAV2 Métrico Hypersim (absoluto) | nenhuma |
 
 ---
@@ -176,8 +173,7 @@ python3 scripts/calibrar_depth_metrico.py \
 
 | Pipeline | fr2_xyz | fr1_desk | fr3_office |
 |---|---|---|---|
-| RGB-D Baseline | 0.40cm | 1.69cm | 1.21cm |
-| Monocular | 7.91cm | 6.05cm | 121.66cm |
+| RGB-D Baseline (referência) | 0.40cm | 1.69cm | 1.21cm |
 | MiDaS puro | 27.79cm | 28.52cm | 440.88cm |
 | **MiDaS + Affine** | **8.15cm** | **21.00cm** | **42.85cm** |
 | DAV2 Métrico | 8.75cm | 24.58cm | 31.22cm |
