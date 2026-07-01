@@ -1,14 +1,4 @@
 Dataset,Pipeline,RMSE (cm),Mean (cm),Max (cm),Poses,Cob (%),Trajetória
-fr2_xyz,RGB-D Baseline,0.4,0.36,1.02,3615,98.5,CameraTrajectory
-fr2_xyz,Monocular,7.91,7.18,14.6,62,1.7,KeyFrameTrajectory
-fr2_xyz,MiDaS,27.79,23.32,74.27,3669,100.0,CameraTrajectory
-fr2_xyz,MiDaS + Affine,8.15,6.19,27.48,3669,100.0,CameraTrajectory
-fr2_xyz,DAV2 Métrico,8.75,7.64,17.36,3669,100.0,CameraTrajectory
-fr1_desk,RGB-D Baseline,1.69,1.42,6.19,572,99.8,CameraTrajectory
-fr1_desk,Monocular,6.05,5.77,10.04,118,20.6,KeyFrameTrajectory
-fr1_desk,MiDaS,28.52,26.15,56.42,612,106.8,CameraTrajectory
-fr1_desk,MiDaS + Affine,21.0,18.99,41.94,612,106.8,CameraTrajectory
-fr1_desk,DAV2 Métrico,24.58,22.82,40.0,612,106.8,CameraTrajectory
 fr3_office,RGB-D Baseline,1.21,1.04,4.34,2486,96.2,CameraTrajectory
 fr3_office,Monocular,121.66,117.87,165.92,307,11.9,KeyFrameTrajectory
 fr3_office,MiDaS,440.88,411.11,697.11,2580,99.8,CameraTrajectory
